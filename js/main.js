@@ -5,51 +5,60 @@
   'use strict';
 
   /* ======================================================
-     CONFIG: the phone number and WhatsApp message live here.
+     CONFIG: change the phone number and message here only.
      ====================================================== */
   const CONFIG = {
-    // International format: 972 + the number without the leading 0
+    // Noa's phone in international format: 972 + the number without the leading 0.
+    // Example: 050-123-4567  ->  '972501234567'
     phoneIntl: '972547761974',
-    // How the number is shown on the site
+
+    // How the number is shown on the site.
     phoneDisplay: '054-776-1974',
-    // Ready-made message for every WhatsApp button (except the composer)
-    waMessage: 'היי נועה! 👋\nהגעתי דרך האתר ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית.'
+
+    // The ready-made WhatsApp message used by every WhatsApp button.
+    waMessage: 'היי נועה! 👋\nהגעתי דרך האתר ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית 🧘‍♀️'
   };
 
   const root = document.documentElement;
   const body = document.body;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const $ = (s, c = document) => c.querySelector(s);
-  const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+  const finePointer = window.matchMedia('(pointer: fine)').matches;
+
+  const $ = (sel, ctx = document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
   const waLink = (text) => `https://wa.me/${CONFIG.phoneIntl}?text=${encodeURIComponent(text)}`;
 
   /* ---------- phone + WhatsApp links ---------- */
   $$('[data-phone-display]').forEach((el) => { el.textContent = CONFIG.phoneDisplay; });
-  $$('[data-tel]').forEach((el) => { el.href = `tel:+${CONFIG.phoneIntl}`; });
-  $$('[data-wa]').forEach((el) => { if (el.id !== 'wa-send') el.href = waLink(CONFIG.waMessage); });
+  $$('[data-tel]').forEach((el) => {
+    el.href = `tel:+${CONFIG.phoneIntl}`;
+    el.setAttribute('aria-label', `חיוג לנועה: ${CONFIG.phoneDisplay}`);
+  });
+  $$('[data-wa]').forEach((el) => {
+    if (el.id !== 'wa-send') el.href = waLink(CONFIG.waMessage);
+  });
 
-  /* ---------- WhatsApp composer ---------- */
+  /* ---------- WhatsApp message composer ---------- */
   const nameInput = $('#wa-name');
-  const goals = $$('input[name="goal"]');
-  const times = $$('input[name="time"]');
+  const goalInputs = $$('input[name="goal"]');
   const preview = $('#wa-preview');
   const sendBtn = $('#wa-send');
-  const bubble = preview && preview.closest('.bubble');
+  const bubble = preview ? preview.closest('.bubble') : null;
 
-  const joinAnd = (a) => (a.length < 2 ? a.join('') : `${a.slice(0, -1).join(', ')} ו${a[a.length - 1]}`);
-  const joinOr = (a) => (a.length < 2 ? a.join('') : `${a.slice(0, -1).join(', ')} או ${a[a.length - 1]}`);
-  const checked = (list) => list.filter((i) => i.checked).map((i) => i.value);
+  const joinHebrew = (items) => {
+    if (items.length <= 1) return items.join('');
+    return `${items.slice(0, -1).join(', ')} ו${items[items.length - 1]}`;
+  };
 
   const buildMessage = () => {
     const name = nameInput ? nameInput.value.trim().replace(/\s+/g, ' ') : '';
-    const g = checked(goals);
-    const t = checked(times);
+    const goals = goalInputs.filter((i) => i.checked).map((i) => i.value);
+
     let msg = 'היי נועה! 👋\n';
     msg += name ? `אני ${name}, הגעתי דרך האתר ` : 'הגעתי דרך האתר ';
-    msg += 'ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית.';
-    if (g.length) msg += `\nמה שמעניין אותי: ${joinAnd(g)}.`;
-    if (t.length) msg += `\nהכי נוח לי להתאמן ${joinOr(t)}.`;
+    msg += 'ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית 🧘‍♀️';
+    if (goals.length) msg += `\nמה שהכי חשוב לי: ${joinHebrew(goals)}.`;
     msg += '\nתודה!';
     return msg;
   };
@@ -59,15 +68,16 @@
     const msg = buildMessage();
     preview.textContent = msg;
     sendBtn.href = waLink(msg);
-    if (animate && bubble) {
+    if (animate && bubble && !reduceMotion) {
       bubble.classList.remove('pop');
-      void bubble.offsetWidth;
+      void bubble.offsetWidth; // restart the animation
       bubble.classList.add('pop');
     }
   };
+
   updateComposer(false);
   if (nameInput) nameInput.addEventListener('input', () => updateComposer(false));
-  [...goals, ...times].forEach((i) => i.addEventListener('change', () => updateComposer(true)));
+  goalInputs.forEach((i) => i.addEventListener('change', () => updateComposer(true)));
 
   /* ---------- copy phone ---------- */
   const toast = $('.toast');
@@ -79,6 +89,7 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
   };
+
   const copyBtn = $('#copy-phone');
   if (copyBtn) {
     copyBtn.addEventListener('click', async () => {
@@ -87,7 +98,9 @@
       } catch {
         const ta = document.createElement('textarea');
         ta.value = CONFIG.phoneDisplay;
-        ta.style.cssText = 'position:fixed;opacity:0';
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
         document.body.appendChild(ta);
         ta.select();
         try { document.execCommand('copy'); } catch { /* ignore */ }
@@ -98,63 +111,55 @@
   }
 
   /* ---------- mobile menu ---------- */
-  const burger = $('.burger');
+  const menuBtn = $('.menu-toggle');
   const setMenu = (open) => {
     body.classList.toggle('menu-open', open);
-    if (!burger) return;
-    burger.setAttribute('aria-expanded', String(open));
-    burger.setAttribute('aria-label', open ? 'סגירת תפריט' : 'פתיחת תפריט');
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded', String(open));
+      menuBtn.setAttribute('aria-label', open ? 'סגירת תפריט' : 'פתיחת תפריט');
+    }
   };
-  if (burger) {
-    burger.addEventListener('click', () => setMenu(!body.classList.contains('menu-open')));
-    $$('.nav a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  if (menuBtn) {
+    menuBtn.addEventListener('click', () => setMenu(!body.classList.contains('menu-open')));
+    $$('.main-nav a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
   }
 
-  /* ---------- rotating words in the hero ---------- */
-  const words = $$('.rot-word');
-  if (words.length > 1) {
-    let idx = 0;
-    setInterval(() => {
-      if (document.hidden) return;
-      const cur = words[idx];
-      idx = (idx + 1) % words.length;
-      const next = words[idx];
-      cur.classList.remove('is-active');
-      cur.classList.add('is-out');
-      next.classList.remove('is-out');
-      next.classList.add('is-active');
-      setTimeout(() => cur.classList.remove('is-out'), 750);
-    }, 2600);
-  }
-
-  /* ---------- scroll: header, floating button, flowing path ---------- */
-  const header = $('.header');
+  /* ---------- header, progress bar, steps line, floating button ---------- */
+  const header = $('.site-header');
+  const progress = $('.scroll-progress');
   const hero = $('.hero');
   const contact = $('#contact');
   const waFloat = $('.wa-float');
-  const flow = $('.flow');
-  const flowLine = $('.flow-line');
+  const stepsWrap = $('.steps-wrap');
+  const stepsLine = $('.steps-line');
+  const steps = $$('.step');
 
   let ticking = false;
   const onScroll = () => {
-    ticking = false;
     const y = window.scrollY;
     const vh = window.innerHeight;
+    const max = root.scrollHeight - vh;
 
-    if (header) header.classList.toggle('scrolled', y > 24);
+    if (header) header.classList.toggle('scrolled', y > 20);
+    if (progress) progress.style.setProperty('--progress', max > 0 ? (y / max).toFixed(4) : 0);
 
     if (waFloat && hero && contact) {
-      const c = contact.getBoundingClientRect();
-      const inContact = c.top < vh * 0.55 && c.bottom > vh * 0.45;
-      waFloat.classList.toggle('show', y > hero.offsetHeight * 0.5 && !inContact);
+      const pastHero = y > hero.offsetHeight * 0.6;
+      const cRect = contact.getBoundingClientRect();
+      const contactInView = cRect.top < vh * 0.6 && cRect.bottom > vh * 0.4;
+      waFloat.classList.toggle('show', pastHero && !contactInView);
     }
 
-    if (flow && flowLine) {
-      const r = flow.getBoundingClientRect();
-      const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (vh * 0.55)));
-      flowLine.style.setProperty('--draw', (1 - p).toFixed(4));
+    if (stepsWrap && stepsLine) {
+      const r = stepsWrap.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (vh * 0.7 - r.top) / (r.height * 0.9)));
+      stepsLine.style.setProperty('--p', p.toFixed(4));
+      const n = steps.length;
+      steps.forEach((s, i) => s.classList.toggle('lit', p >= (n > 1 ? i / (n - 1) : 0) - 0.02 && p > 0));
     }
+
+    ticking = false;
   };
   window.addEventListener('scroll', () => {
     if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
@@ -162,51 +167,134 @@
   window.addEventListener('resize', onScroll);
   onScroll();
 
+  /* floating button: show a little speech bubble once */
+  if (waFloat && !reduceMotion) {
+    setTimeout(() => {
+      if (!waFloat.classList.contains('show')) return;
+      waFloat.classList.add('tip');
+      setTimeout(() => waFloat.classList.remove('tip'), 4500);
+    }, 9000);
+  }
+
+  /* ---------- hero intro: draw the accent underline ---------- */
+  setTimeout(() => root.classList.add('hero-ready'), reduceMotion ? 0 : 900);
+
+  /* ---------- counters ---------- */
+  const runCounter = (el) => {
+    const to = parseFloat(el.dataset.count) || 0;
+    const from = parseFloat(el.dataset.countFrom) || 0;
+    if (reduceMotion) { el.textContent = to; return; }
+    const dur = 1600;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(from + (to - from) * eased);
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    el.textContent = from;
+    requestAnimationFrame(tick);
+  };
+
   /* ---------- reveal on scroll ---------- */
   const revealEls = $$('[data-reveal]');
-  if ('IntersectionObserver' in window) {
+  const onRevealed = (el) => {
+    el.classList.add('is-visible');
+    $$('[data-count]', el).forEach(runCounter);
+    if (el.classList.contains('tilt')) {
+      const ready = () => el.classList.add('tilt-ready');
+      el.addEventListener('transitionend', ready, { once: true });
+      setTimeout(ready, 1400);
+    }
+  };
+
+  if ('IntersectionObserver' in window && !reduceMotion) {
     const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        e.target.classList.add('in');
-        io.unobserve(e.target);
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        onRevealed(entry.target);
+        io.unobserve(entry.target);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
+    }, { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
     revealEls.forEach((el) => io.observe(el));
   } else {
-    revealEls.forEach((el) => el.classList.add('in'));
+    revealEls.forEach(onRevealed);
   }
 
   /* ---------- active nav link ---------- */
-  const navLinks = $$('.nav a[href^="#"]:not(.nav-mobile-cta)');
-  if ('IntersectionObserver' in window) {
+  const navLinks = $$('.main-nav a[href^="#"]');
+  if ('IntersectionObserver' in window && navLinks.length) {
+    const sections = navLinks
+      .map((a) => document.getElementById(a.getAttribute('href').slice(1)))
+      .filter(Boolean);
     const navIO = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${e.target.id}`));
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${entry.target.id}`));
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
-    navLinks.forEach((a) => {
-      const sec = document.getElementById(a.getAttribute('href').slice(1));
-      if (sec) navIO.observe(sec);
+    sections.forEach((s) => navIO.observe(s));
+  }
+
+  /* ---------- pointer effects (desktop only) ---------- */
+  if (finePointer && !reduceMotion) {
+    // soft glow that follows the cursor
+    const glow = $('.cursor-glow');
+    if (glow) {
+      let gx = window.innerWidth / 2, gy = window.innerHeight / 2, tx = gx, ty = gy, running = false;
+      const follow = () => {
+        gx += (tx - gx) * 0.12;
+        gy += (ty - gy) * 0.12;
+        glow.style.transform = `translate(${gx}px, ${gy}px)`;
+        if (Math.abs(tx - gx) > 0.5 || Math.abs(ty - gy) > 0.5) requestAnimationFrame(follow);
+        else running = false;
+      };
+      window.addEventListener('pointermove', (e) => {
+        tx = e.clientX; ty = e.clientY;
+        body.classList.add('has-pointer');
+        if (!running) { running = true; requestAnimationFrame(follow); }
+      }, { passive: true });
+      document.addEventListener('pointerleave', () => body.classList.remove('has-pointer'));
+    }
+
+    // magnetic buttons
+    $$('.magnetic').forEach((btn) => {
+      btn.addEventListener('pointermove', (e) => {
+        const r = btn.getBoundingClientRect();
+        const mx = (e.clientX - (r.left + r.width / 2)) * 0.22;
+        const my = (e.clientY - (r.top + r.height / 2)) * 0.3;
+        btn.style.setProperty('--mx', `${mx.toFixed(1)}px`);
+        btn.style.setProperty('--my', `${my.toFixed(1)}px`);
+      });
+      btn.addEventListener('pointerleave', () => {
+        btn.style.setProperty('--mx', '0px');
+        btn.style.setProperty('--my', '0px');
+      });
+    });
+
+    // 3D tilt cards
+    $$('.tilt').forEach((card) => {
+      if (!card.hasAttribute('data-reveal')) card.classList.add('tilt-ready');
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--rx', `${(-y * 8).toFixed(2)}deg`);
+        card.style.setProperty('--ry', `${(x * 10).toFixed(2)}deg`);
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+      });
     });
   }
 
-  /* ---------- hero parallax (desktop mouse) ---------- */
-  const art = $('.hero-art');
-  if (art && finePointer && !reduceMotion) {
-    const layers = $$('[data-depth]', art);
-    hero.addEventListener('pointermove', (e) => {
-      const r = hero.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;
-      const y = (e.clientY - r.top) / r.height - 0.5;
-      layers.forEach((l) => {
-        const d = parseFloat(l.dataset.depth) || 0;
-        l.style.transform = `translate(${(-x * d).toFixed(1)}px, ${(-y * d).toFixed(1)}px)`;
-      });
-    });
-    hero.addEventListener('pointerleave', () => layers.forEach((l) => { l.style.transform = ''; }));
-  }
+  /* ---------- photos: fade in once loaded ---------- */
+  $$('img[data-fade]').forEach((img) => {
+    const done = () => img.classList.add('loaded');
+    if (img.complete && img.naturalWidth) done();
+    else img.addEventListener('load', done, { once: true });
+  });
 
   /* ---------- footer year ---------- */
   const year = $('#year');
