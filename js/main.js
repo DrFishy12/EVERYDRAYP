@@ -1,5 +1,5 @@
 /* =========================================================
-   EVERYDRAYP · נועה — site behaviour
+   EVERYDRAY Pilates · נועה — site behaviour
    ========================================================= */
 (() => {
   'use strict';
@@ -179,7 +179,8 @@
   }
 
   /* ---------- hero intro: draw the accent underline ---------- */
-  setTimeout(() => root.classList.add('hero-ready'), reduceMotion ? 0 : 900);
+  const introShown = !root.classList.contains('no-splash') && !reduceMotion;
+  setTimeout(() => root.classList.add('hero-ready'), reduceMotion ? 0 : (introShown ? 2650 : 900));
 
   /* ---------- counters ---------- */
   const runCounter = (el) => {

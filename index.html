@@ -3,26 +3,47 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EVERYDRAYP · נועה — פילאטיס פרטי לנשים עד הבית</title>
+  <title>EVERYDRAY Pilates · נועה — פילאטיס פרטי לנשים עד הבית</title>
   <meta name="description" content="נועה, מדריכת פילאטיס מוסמכת. אימוני פילאטיס פרטיים לנשים, אחת-על-אחת, עד הבית שלך. לתיאום אימון בוואטסאפ או בטלפון.">
-  <meta name="theme-color" content="#FBF0F1">
+  <meta name="theme-color" content="#FCF2F3">
 
   <meta property="og:type" content="website">
   <meta property="og:locale" content="he_IL">
-  <meta property="og:title" content="EVERYDRAYP · פילאטיס פרטי לנשים עד הבית">
+  <meta property="og:title" content="EVERYDRAY Pilates · פילאטיס פרטי לנשים עד הבית">
   <meta property="og:description" content="נועה, מדריכת פילאטיס מוסמכת. אימון אישי שבנוי בשבילך, בבית שלך.">
+  <meta property="og:image" content="https://drfishy12.github.io/EVERYDRAYP/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <script>document.documentElement.classList.add('js')</script>
+  <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/favicon-64.png" sizes="64x64" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <script>
+    document.documentElement.classList.add('js');
+    // show the logo intro only once per visit
+    try {
+      if (sessionStorage.getItem('ed-intro')) document.documentElement.classList.add('no-splash');
+      sessionStorage.setItem('ed-intro', '1');
+    } catch (e) { /* storage unavailable: just show the intro */ }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <a class="skip-link" href="#main">דילוג לתוכן</a>
+
+  <!-- logo intro -->
+  <div class="splash" aria-hidden="true">
+    <div class="splash-in">
+      <img class="splash-icon" src="assets/logo-icon.png" alt="" width="322" height="183">
+      <span class="splash-word">EVERYDRAY</span>
+      <span class="splash-sub">PILATES STUDIO</span>
+    </div>
+  </div>
 
   <div class="scroll-progress" aria-hidden="true"></div>
   <div class="cursor-glow" aria-hidden="true"></div>
@@ -30,9 +51,12 @@
   <!-- ============ HEADER ============ -->
   <header class="site-header" id="top">
     <div class="container header-inner">
-      <a href="#top" class="logo" aria-label="EVERYDRAYP — חזרה לראש העמוד">
-        <span class="logo-mark" aria-hidden="true"></span>
-        <span class="logo-text">EVERYDRAYP</span>
+      <a href="#top" class="logo" aria-label="EVERYDRAY Pilates — חזרה לראש העמוד">
+        <img class="logo-icon" src="assets/logo-icon.png" alt="" width="322" height="183">
+        <span class="logo-words" aria-hidden="true">
+          <span class="logo-text">EVERYDRAY</span>
+          <span class="logo-sub">PILATES STUDIO</span>
+        </span>
       </a>
 
       <nav class="main-nav" id="main-nav" aria-label="ניווט ראשי">
@@ -126,7 +150,7 @@
               </defs>
               <text textLength="488" lengthAdjust="spacing"><textPath href="#circlePath">PRIVATE PILATES · AT HOME · FOR WOMEN ·</textPath></text>
             </svg>
-            <span class="spin-badge-center">1:1</span>
+            <img class="spin-badge-logo" src="assets/logo-icon-light.png" alt="" width="322" height="183">
           </div>
         </div>
       </div>
@@ -166,7 +190,7 @@
             <p class="cert-title">מדריכת פילאטיס<br>מוסמכת</p>
             <div class="cert-line" aria-hidden="true"></div>
             <p class="cert-name">נועה</p>
-            <p class="cert-brand">EVERYDRAYP</p>
+            <p class="cert-brand"><img src="assets/logo-icon.png" alt="" width="322" height="183">EVERYDRAY</p>
           </div>
           <div class="about-ring" aria-hidden="true"></div>
         </div>
@@ -358,7 +382,7 @@
           <!-- WhatsApp composer -->
           <div class="wa-card" data-reveal>
             <div class="wa-head">
-              <span class="wa-avatar" aria-hidden="true">נ</span>
+              <span class="wa-avatar" aria-hidden="true"><img src="assets/logo-icon.png" alt="" width="322" height="183"></span>
               <span>
                 <strong>נועה · פילאטיס פרטי</strong>
                 <small>הודעה ישירה לנועה</small>
@@ -429,9 +453,12 @@
   <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
     <div class="container footer-inner">
-      <a href="#top" class="logo logo-light" aria-label="EVERYDRAYP — חזרה לראש העמוד">
-        <span class="logo-mark" aria-hidden="true"></span>
-        <span class="logo-text">EVERYDRAYP</span>
+      <a href="#top" class="logo logo-light footer-logo" aria-label="EVERYDRAY Pilates — חזרה לראש העמוד">
+        <img class="logo-icon" src="assets/logo-icon-light.png" alt="" width="322" height="183">
+        <span class="logo-words" aria-hidden="true">
+          <span class="logo-text">EVERYDRAY</span>
+          <span class="logo-sub">PILATES STUDIO</span>
+        </span>
       </a>
       <p class="footer-tag">נועה · פילאטיס פרטי לנשים, עד הבית</p>
       <nav class="footer-nav" aria-label="ניווט תחתון">
@@ -441,7 +468,7 @@
         <a href="#faq">שאלות</a>
         <a href="#contact">צרי קשר</a>
       </nav>
-      <p class="copyright">© <span id="year">2026</span> EVERYDRAYP. כל הזכויות שמורות.</p>
+      <p class="copyright">© <span id="year">2026</span> EVERYDRAY Pilates. כל הזכויות שמורות.</p>
       <p class="photo-credit">צילומים: Unsplash</p>
     </div>
   </footer>
