@@ -16,7 +16,8 @@
     phoneDisplay: '054-776-1974',
 
     // The ready-made WhatsApp message used by every WhatsApp button.
-    waMessage: 'היי נועה! 👋\nהגעתי דרך האתר ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית 🧘‍♀️'
+    // Use emojis from the basic range (like ☺️ ✨ ❤️): 4-byte emojis such as 👋 can arrive as "�".
+    waMessage: 'היי נועה! ☺️\nהגעתי דרך האתר ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית ✨'
   };
 
   const root = document.documentElement;
@@ -27,7 +28,8 @@
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
-  const waLink = (text) => `https://wa.me/${CONFIG.phoneIntl}?text=${encodeURIComponent(text)}`;
+  // api.whatsapp.com/send keeps emojis intact; the wa.me short link can turn them into "�".
+  const waLink = (text) => `https://api.whatsapp.com/send?phone=${CONFIG.phoneIntl}&text=${encodeURIComponent(text)}`;
 
   /* ---------- phone + WhatsApp links ---------- */
   $$('[data-phone-display]').forEach((el) => { el.textContent = CONFIG.phoneDisplay; });
@@ -55,9 +57,9 @@
     const name = nameInput ? nameInput.value.trim().replace(/\s+/g, ' ') : '';
     const goals = goalInputs.filter((i) => i.checked).map((i) => i.value);
 
-    let msg = 'היי נועה! 👋\n';
+    let msg = 'היי נועה! ☺️\n';
     msg += name ? `אני ${name}, הגעתי דרך האתר ` : 'הגעתי דרך האתר ';
-    msg += 'ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית 🧘‍♀️';
+    msg += 'ואשמח לשמוע פרטים על אימון פילאטיס פרטי עד הבית ✨';
     if (goals.length) msg += `\nמה שהכי חשוב לי: ${joinHebrew(goals)}.`;
     msg += '\nתודה!';
     return msg;
