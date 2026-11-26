@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://drfishy12.github.io/EVERYDRAYP/sitemap.xml
